@@ -1,9 +1,10 @@
 {
   "database": {
-    "username": "root",
-    "password": null,
-    "host": "127.0.0.1",
-    "dialect": "sqlite",
-    "storage": "feedback_db.sqlite"
+    "username": "heart",
+    "password": "heart",
+    "host": "10.32.52.17",
+    "port": 3306,
+    "dialect": "mysql",
+    "database": "test"
   }
 }
