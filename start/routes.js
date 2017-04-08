@@ -140,6 +140,7 @@ router.post('/upsert', function (req, res, next) {
         next(err);
     });
 });
+
 //upsert feedback and sync to google sheet
 router.post('/upsert/:id/autosync', function (req, res, next) {
     var is_recorded=false;
@@ -181,7 +182,33 @@ router.post('/upsert/unknown', function(req, res, next){
         
     }, (error)=>{
         next(error);
-    }); 
+    });
+})
+
+
+router.post('/report/upsert/spreadsheets/:id/sync',function(req,res,next){
+    auth = req.get('Authorization');
+    if (!auth) {
+        return next(Error('Authorization required.'));
+    }
+    var accessToken = auth.split(' ')[1];
+    var helper = new SheetsHelper(accessToken);
+
+    var spreadsheet;
+    var feedbacks;
+    Sequelize.Promise.all([
+        models.Spreadsheet.findById(req.params.id),
+        models.Feedback.findAll()
+    ]).then(function (results) {
+        spreadsheet = results[0];
+        feedbacks = results[1];
+        helper.sync(spreadsheet.id, spreadsheet.sheetId, feedbacks, function (err) {
+            if (err) {
+                return next(err);
+            }
+            return res.json(feedbacks.length);
+        });
+    });
 })
 
 // TODO: Add route for creating spreadsheet.
