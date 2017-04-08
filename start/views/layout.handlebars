@@ -42,9 +42,9 @@
     <meta name="google-signin-scope"
           content="https://www.googleapis.com/auth/spreadsheets">
     <meta name="google-signin-client_id"
-          content="856688138892-csaq5utmck9brvq26ch60s63g51sf4to.apps.googleusercontent.com">
+          content="64390137417-75rudtdvrii7l4val0c3dkt6bsabrcsj.apps.googleusercontent.com">
 
-    <script src="https://apis.google.com/js/platform.js?" async defer></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 
     <!--<script>
         function start() {
@@ -74,8 +74,7 @@
                 <b class="name"></b><br/>
                 <i class="email"></i>
             </div>
-            <div class="g-signin2" data-onsuccess="onSignIn"
-                 data-accesstype="offline"
+            <div class="g-signin2" data-onsuccess="onSignIn" data-onfail="onFail" data-onerror="onFail"
                  data-redirecturi="http://devbox.example.com:3000/oauth2callback"></div>
         </div>
         <div class="mdl-layout--large-screen-only mdl-layout__header-row"></div>

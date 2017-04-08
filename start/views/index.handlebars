@@ -52,6 +52,24 @@
                 </div>
             {{/each}}
         </div>
+
+        <div style="width:auto; border-bottom:1px solid grey"></div>
+        <div class="mdl-list__item">
+            <span class="mdl-list__item-primary-content mdl-layout-title">
+                Not Classified Items</span>
+        </div>
+        <ul class="">
+        {{#each todos}}
+            <div class="mdl-list__item">
+                <a  class="mdl-list__item-primary-content" target="_blank">{{id}}</a>
+                <span class="mdl-list__item-primary-content"
+                    target="_blank">{{createdAt}}</a>
+                <button data-id="{{id}}" class="mdl-button mdl-js-button mdl-button--raised
+                       mdl-js-ripple-effect" ref="Convert">Convert</button>
+            </div>
+
+        {{/each}}
+        </ul>
     </section>
     <section id="feedbacks" class="mdl-cell mdl-cell--6-col relative">
         <div class="mdl-grid">
@@ -103,6 +121,8 @@
     </section>
 
     <!-- TODO: Show spreadsheets -->
-
+    <section>
+        
+    </section>
 
 </div>

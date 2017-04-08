@@ -24,8 +24,8 @@ var router = express.Router();
 var models = require('./models');
 var Sequelize = require('sequelize');
 var google = require('googleapis');
-var CLIENT_ID = "856688138892-csaq5utmck9brvq26ch60s63g51sf4to.apps.googleusercontent.com";
-var CLIENT_SECRET = "He3H1RZAZeXY8rJN1xc_iQaf";
+var CLIENT_ID = "64390137417-75rudtdvrii7l4val0c3dkt6bsabrcsj.apps.googleusercontent.com";
+var CLIENT_SECRET = "1OSFZTicWvhs2T67CDqh-KTH";
 var REDIRECT_URL = "http://devbox.example.com:3000/oauth2callback";
 var OAuth2 = google.auth.OAuth2;
 var oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
@@ -36,13 +36,21 @@ router.get('/', function (req, res, next) {
         order: [['id', 'DESC']],
         limit:4
     };
+
+    var toDoOptions = {
+        order: [['id', 'DESC']],
+        limit:10
+    };
+
     Sequelize.Promise.all([
         models.Feedback.findAll(options),
-        models.Spreadsheet.findAll(options)
+        models.Spreadsheet.findAll(options),
+        models.ToDo.findAll(toDoOptions)
     ]).then(function (results) {
         res.render('index', {
             feedbacks: results[0],
-            spreadsheets: results[1]
+            spreadsheets: results[1],
+            todos: results[2]
         });
     });
 });
@@ -145,6 +153,7 @@ router.post('/upsert/:id/autosync', function (req, res, next) {
         var feedbacks;
         var accessToken = auth.split(' ')[1];
         var helper = new SheetsHelper(accessToken);
+
         Sequelize.Promise.all([
             models.Spreadsheet.findById(req.params.id),
             models.Feedback.findAll()
@@ -165,6 +174,15 @@ router.post('/upsert/:id/autosync', function (req, res, next) {
         next(err);
     });
 });
+
+router.post('/upsert/unknown', function(req, res, next){
+    var raw = req.body;
+    models.ToDo.upsert(Object.assign({}, {rawData: escape(req.body.rawData)})).then(()=>{
+        
+    }, (error)=>{
+        next(error);
+    }); 
+})
 
 // TODO: Add route for creating spreadsheet.
 var SheetsHelper = require('./sheets');
