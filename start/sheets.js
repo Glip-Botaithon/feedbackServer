@@ -24,6 +24,16 @@ var COLUMNS = [
     {field: 'device', header: 'Device'}
 ];
 
+var REPORT_COLUMNS = [
+    {field: 'id', header: 'ID'},
+    {field: 'title', header: 'title'},
+    {field: 'date_time', header: 'date_time'},
+    {field: 'run', header: 'run'},
+    {field: 'failed', header: 'failed'},
+    {field: 'passed', header: 'passed'},
+    {field: 'skipped', header: 'skipped'},
+];
+
 SheetsHelper.prototype.createSpreadsheet = function (title, callback) {
     var self = this;
     var request = {
@@ -36,20 +46,20 @@ SheetsHelper.prototype.createSpreadsheet = function (title, callback) {
                     properties: {
                         title: 'Feedback',
                         gridProperties: {
-                            columnCount: COLUMNS.length+1,
+                            columnCount: COLUMNS.length + 1,
                             frozenRowCount: 1
                         }
                     }
                 }
                 // TODO: Add more sheets.
                 /*{
-                    properties: {
-                        title: 'Pivot',
-                        gridProperties: {
-                            hideGridlines: true
-                        }
-                    }
-                }*/
+                 properties: {
+                 title: 'Pivot',
+                 gridProperties: {
+                 hideGridlines: true
+                 }
+                 }
+                 }*/
             ]
         }
     };
@@ -64,11 +74,11 @@ SheetsHelper.prototype.createSpreadsheet = function (title, callback) {
         ];
 // TODO: Add pivot table and chart.
         /*var pivotSheetId = spreadsheet.sheets[1].properties.sheetId;
-        requests = requests.concat([
-            buildPivotTableRequest(dataSheetId, pivotSheetId),
-            buildFormatPivotTableRequest(pivotSheetId),
-            buildAddChartRequest(pivotSheetId)
-        ]);*/
+         requests = requests.concat([
+         buildPivotTableRequest(dataSheetId, pivotSheetId),
+         buildFormatPivotTableRequest(pivotSheetId),
+         buildAddChartRequest(pivotSheetId)
+         ]);*/
         var request = {
             spreadsheetId: spreadsheet.spreadsheetId,
             resource: {
@@ -108,6 +118,48 @@ SheetsHelper.prototype.sync = function (spreadsheetId, sheetId, feedbacks, callb
                 columnIndex: 0
             },
             rows: buildRowsForFeedBacks(feedbacks),
+            fields: '*'
+        }
+    });
+    // Send the batchUpdate request.
+    var request = {
+        spreadsheetId: spreadsheetId,
+        resource: {
+            requests: requests
+        }
+    };
+    this.service.spreadsheets.batchUpdate(request, function (err) {
+        if (err) {
+            return callback(err);
+        }
+        return callback();
+    });
+};
+
+SheetsHelper.prototype.syncReport = function (spreadsheetId, sheetId, reports, callback) {
+    var requests = [];
+    // Resize the sheet.
+    requests.push({
+        updateSheetProperties: {
+            properties: {
+                sheetId: sheetId,
+                gridProperties: {
+                    rowCount: reports.length + 1,
+                    columnCount: REPORT_COLUMNS.length
+                }
+            },
+            fields: 'gridProperties(rowCount,columnCount)'
+        }
+    });
+    // Set the cell values.
+    requests.push({
+        updateCells: {
+            start: {
+                sheetId: sheetId,
+                rowIndex: 1,
+                columnIndex: 0
+            },
+            rows: buildRowsForReports(reports),
             fields: '*'
         }
     });
@@ -187,6 +239,24 @@ function buildRowsForFeedBacks(feedbacks) {
                     };
             }
         });
+
+        return {
+            values: cells
+        };
+    });
+}
+
+function buildRowsForReports(reports) {
+    return reports.map(function (report) {
+        var cells = REPORT_COLUMNS.map(function (column) {
+            return {
+                userEnteredValue: {
+                    stringValue: report[column.field].toString()
+                }
+            };
+        });
+
+
         return {
             values: cells
         };

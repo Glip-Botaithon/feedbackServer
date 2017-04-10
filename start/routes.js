@@ -187,27 +187,36 @@ router.post('/upsert/unknown', function(req, res, next){
 
 
 router.post('/report/upsert/spreadsheets/:id/sync',function(req,res,next){
-    auth = req.get('Authorization');
-    if (!auth) {
-        return next(Error('Authorization required.'));
-    }
-    var accessToken = auth.split(' ')[1];
-    var helper = new SheetsHelper(accessToken);
+    var is_recorded=false;
+    var is_synced=false;
+    models.Report.upsert(req.body).then(function () {
+        is_recorded=true;
+        if (!auth) {
+            return next(Error('Authorization required.'));
+        }
+        var spreadsheet;
+        var reports;
+        var accessToken = auth.split(' ')[1];
+        var helper = new SheetsHelper(accessToken);
 
-    var spreadsheet;
-    var feedbacks;
-    Sequelize.Promise.all([
-        models.Spreadsheet.findById(req.params.id),
-        models.Feedback.findAll()
-    ]).then(function (results) {
-        spreadsheet = results[0];
-        feedbacks = results[1];
-        helper.sync(spreadsheet.id, spreadsheet.sheetId, feedbacks, function (err) {
-            if (err) {
-                return next(err);
-            }
-            return res.json(feedbacks.length);
+        Sequelize.Promise.all([
+            models.Spreadsheet.findById(req.params.id),
+            models.Report.findAll()
+        ]).then(function (results) {
+            spreadsheet = results[0];
+            reports = results[1];
+            helper.syncReport(spreadsheet.id, spreadsheet.sheetId, reports, function (err) {
+                if (err) {
+                    return next(err);
+                }else{
+                    is_synced=true;
+                }
+                return res.json({is_recorded:is_recorded,is_synced:is_synced});
+            });
         });
+
+    }, function (err) {
+        next(err);
     });
 })
 
