@@ -110,17 +110,37 @@ SheetsHelper.prototype.sync = function (spreadsheetId, sheetId, feedbacks, callb
         }
     });
     // Set the cell values.
-    requests.push({
-        updateCells: {
-            start: {
-                sheetId: sheetId,
-                rowIndex: 1,
-                columnIndex: 0
-            },
-            rows: buildRowsForFeedBacks(feedbacks),
-            fields: '*'
-        }
-    });
+    switch (spreadsheetId){
+        //feedback
+        case "1pm20jrnKlSlo4f5oz5qQYUclI1lam4ht9d5dp6niA2k":
+            requests.push({
+                updateCells: {
+                    start: {
+                        sheetId: sheetId,
+                        rowIndex: 1,
+                        columnIndex: 0
+                    },
+                    rows: buildRowsForFeedBacks(feedbacks),
+                    fields: '*'
+                }
+            })
+            break;
+        //ucc report
+        case  "1MZRJpHVixCy13tdZkkI0POcU3bLuO7Dj91DqTiKkN-A":
+            requests.push({
+                updateCells: {
+                    start: {
+                        sheetId: sheetId,
+                        rowIndex: 1,
+                        columnIndex: 0
+                    },
+                    rows: buildRowsForReports(feedbacks),
+                    fields: '*'
+                }
+            });
+            break;
+    }
+
     // Send the batchUpdate request.
     var request = {
         spreadsheetId: spreadsheetId,

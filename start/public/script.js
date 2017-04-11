@@ -71,7 +71,17 @@ $(function () {
             if (err) return showError(err);
             showMessage('Sync complete.');
             console.log("update sheet name with latest sync time");
-            var new_sheet_name='Feedback (' + new Date().toDateString() + ')';
+            switch (spreadsheetId){
+                case "1pm20jrnKlSlo4f5oz5qQYUclI1lam4ht9d5dp6niA2k":
+                    var new_sheet_name='Feedback (' + new Date().toDateString() + ')';
+                    break;
+                case "1MZRJpHVixCy13tdZkkI0POcU3bLuO7Dj91DqTiKkN-A":
+                    var new_sheet_name='UCC_Report (' + new Date().toDateString() + ')';
+                    break;
+                default :
+                    var new_sheet_name='Feedback (' + new Date().toDateString() + ')';
+            }
+
             var url='/spreadsheets/'+spreadsheetId+'/update/name/'+new_sheet_name;
             $.ajax(url);
             window.location.reload();

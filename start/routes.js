@@ -251,6 +251,7 @@ router.post('/spreadsheets/:id/sync', function (req, res, next) {
     auth = req.get('Authorization');
     var spreadsheet;
     var feedbacks;
+    var reports;
     if (!auth) {
         return next(Error('Authorization required.'));
     }
@@ -258,16 +259,30 @@ router.post('/spreadsheets/:id/sync', function (req, res, next) {
     var helper = new SheetsHelper(accessToken);
     Sequelize.Promise.all([
         models.Spreadsheet.findById(req.params.id),
-        models.Feedback.findAll()
+        models.Feedback.findAll(),
+        models.Report.findAll()
     ]).then(function (results) {
         spreadsheet = results[0];
         feedbacks = results[1];
-        helper.sync(spreadsheet.id, spreadsheet.sheetId, feedbacks, function (err) {
-            if (err) {
-                return next(err);
-            }
-            return res.json(feedbacks.length);
-        });
+        reports = results[2];
+        switch (req.params.id){
+            case "1pm20jrnKlSlo4f5oz5qQYUclI1lam4ht9d5dp6niA2k":
+                helper.sync(spreadsheet.id, spreadsheet.sheetId, feedbacks, function (err) {
+                    if (err) {
+                        return next(err);
+                    }
+                    return res.json(feedbacks.length);
+                });
+                break;
+            case "1MZRJpHVixCy13tdZkkI0POcU3bLuO7Dj91DqTiKkN-A":
+                helper.syncReport(spreadsheet.id, spreadsheet.sheetId, reports, function (err) {
+                    if (err) {
+                        return next(err);
+                    }
+                    return res.json(reports.length);
+                });
+                break;
+        }
     });
 });
 
