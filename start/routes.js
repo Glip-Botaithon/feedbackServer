@@ -77,6 +77,18 @@ router.get('/create', function (req, res, next) {
     res.render('upsert');
 });
 
+router.get('/convert/:id', function (req,res,next){
+    Sequelize.Promise.all([
+        models.ToDo.findById(req.params.id)
+    ]).then(
+        (result)=>{
+            res.render('convert', {
+                todo: Object.assign({}, {rawData: unescape(result[0].rawData)})
+            });
+        }
+    )
+})
+
 router.get('/edit/:id', function (req, res, next) {
     models.Feedback.findById(req.params.id).then(function (feedback) {
         if (feedback) {
@@ -140,6 +152,8 @@ router.post('/upsert', function (req, res, next) {
         next(err);
     });
 });
+
+
 //upsert feedback and sync to google sheet
 router.post('/upsert/:id/autosync', function (req, res, next) {
     var is_recorded=false;

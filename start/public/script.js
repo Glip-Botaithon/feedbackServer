@@ -55,6 +55,10 @@ function onSignIn(user) {
     $('#profile .email').text(profile.getEmail());
 }
 
+function onFail(e){
+    console.log(e);
+}
+
 
 // TODO: Add spreadsheet control handlers.
 $(function () {
@@ -82,6 +86,13 @@ $(function () {
         var url = '/spreadsheets/' + spreadsheetId + '/remove';
         $.ajax(url);
         window.location.reload();
+    });
+
+     $('button[name="convert"]').click(function(){
+        var todo_id = $(this).data('id');
+        var url='/convert/'+todo_id;
+        window.location=url;
+        
     });
 });
 
